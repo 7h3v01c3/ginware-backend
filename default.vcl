@@ -51,6 +51,7 @@ sub vcl_hash {
 
 sub vcl_backend_fetch {
     set bereq.method = "POST";
+    set bereq.http.Authorization = "Basic cmFuZG9tcnBjdXNlcjIzOTQ4OnJwY3JhbmRvbXBhc3N3b3JkOTg0NTc0MzluOHY=";
 }
 
 sub vcl_backend_response {
