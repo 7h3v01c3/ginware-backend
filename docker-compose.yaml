@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  daemon:
+    image: gincoin/wallet-gincoin
+    volumes:
+      - ./datadir:/datadir
+    ports:
+      - 10211:10211
+  varnish:
+    image: emgag/varnish:6.2.0-1
+    depends_on:
+      - daemon
+    volumes:
+      - ./default.vcl:/etc/varnish/default.vcl:ro
+  sslproxy:
+    image: ployst/nginx-ssl-proxy
+    depends_on:
+      - varnish
+    volumes:
+      - /etc/letsencrypt/live/ginware1.gincoin.io/fullchain.pem:/etc/secrets/proxycert:ro
+      - /etc/letsencrypt/live/ginware1.gincoin.io/privkey.pem:/etc/secrets/proxykey:ro
+      - ./dhparam.pem:/etc/secrets/dhparam:ro
+    environment:
+      - ENABLE_SSL=true
+      - TARGET_SERVICE=varnish:80
+      - SERVER_NAME=ginware1.gincoin.io
+    ports:
+      - 443:443
